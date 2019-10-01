@@ -8,6 +8,6 @@ public class CalendarController {
 
 	@RequestMapping("/calendar.do")
 	public String showCalendar() throws Exception{
-		return "/calendar/calendar";
+		return "/calendar";
 	}
 }
