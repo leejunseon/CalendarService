@@ -96,28 +96,28 @@
 <div class="modal fade" id="registerSchedule" tabindex="-1" role="dialog" aria-labelledby="registerScheduleLabel" aria-hidden="true">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="registerScheduleLabel">일정 만들기</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<div class="modal-body">
-				<form>
+			<form action="/addSchedule.do" name='scheduleInfo' method="post">
+				<div class="modal-header">
+					<h5 class="modal-title" id="registerScheduleLabel">일정 만들기</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
 					<div class="form-group">
 						<label class="col-form-label">일정 제목</label>
-						<input type="text" class="form-control" id="recipient-name">
+						<input type="text" name='title' class="form-control" id="recipient-name">
 					</div>
 					<div class="form-group">
 						<label for="message-text" class="col-form-label">일정 설명</label>
-						<textarea class="form-control" id="message-text"></textarea>
+						<textarea class="form-control" name='contents' id="message-text"></textarea>
 					</div>
 					<div class="form-row">
 						<div class="col-md-6">
 							<div class="form-group">
 								<label class="col-form-label">일정 시작 날짜</label>
 								<div class="input-group date" id="datetimepicker1" data-target-input="nearest">
-									<input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1" />
+									<input type="text" name='dateStart' class="form-control datetimepicker-input" data-target="#datetimepicker1" />
 									<div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
 										<div class="input-group-text"><i class="material-icons">calendar_today</i></div>
 									</div>
@@ -128,7 +128,7 @@
 							<div class="form-group">
 								<label class="col-form-label">일정 시작 시간</label>
 								<div class="input-group date" id="datetimepicker2" data-target-input="nearest">
-									<input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker2" />
+									<input type="text" name='timeStart' class="form-control datetimepicker-input" data-target="#datetimepicker2" />
 									<div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
 										<div class="input-group-text"><i class="material-icons">access_time</i></div>
 									</div>
@@ -141,7 +141,7 @@
 							<div class="form-group">
 								<label class="col-form-label">일정 종료 날짜</label>
 								<div class="input-group date" id="datetimepicker3" data-target-input="nearest">
-									<input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker3" />
+									<input type="text" name='dateEnd' class="form-control datetimepicker-input" data-target="#datetimepicker3" />
 									<div class="input-group-append" data-target="#datetimepicker3" data-toggle="datetimepicker">
 										<div class="input-group-text"><i class="material-icons">calendar_today</i></div>
 									</div>
@@ -152,7 +152,7 @@
 							<div class="form-group">
 								<label class="col-form-label">일정 종료 시간</label>
 								<div class="input-group date" id="datetimepicker4" data-target-input="nearest">
-									<input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker4" />
+									<input type="text" name='timeEnd' class="form-control datetimepicker-input" data-target="#datetimepicker4" />
 									<div class="input-group-append" data-target="#datetimepicker4" data-toggle="datetimepicker">
 										<div class="input-group-text"><i class="material-icons">access_time</i></div>
 									</div>
@@ -160,20 +160,20 @@
 							</div>
 						</div>
 						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+							<input class="form-check-input" name='repeatMonthly' type="checkbox" id="inlineCheckbox1" value="y">
 							<label class="form-check-label" for="inlineCheckbox1">매월 반복</label>
 						</div>
 						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
+							<input class="form-check-input" name='allDay' type="checkbox" id="inlineCheckbox2" value="y">
 							<label class="form-check-label" for="inlineCheckbox2">하루 종일</label>
 						</div>
 					</div>
-				</form>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
-				<button type="button" class="btn btn-primary">일정 만들기</button>
-			</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+					<button type="submit" onclick="javascript:addSchedule();" class="btn btn-primary">일정 만들기</button>
+				</div>
+			</form>
 		</div>
 	</div>
 </div>
@@ -203,19 +203,19 @@
 
     $(function () {
         $('#datetimepicker1').datetimepicker({
-            format: 'L'
-        });
+        	format: 'YYYY-MM-DD'
+       	});
         $('#datetimepicker3').datetimepicker({
-            format: 'L'
+            format: 'YYYY-MM-DD'
         });
     });
 
     $(function () {
         $('#datetimepicker2').datetimepicker({
-            format: 'LT'
+            format: 'hh:mm:ss'
         });
         $('#datetimepicker4').datetimepicker({
-            format: 'LT'
+            format: 'hh:mm:ss'
         });
     });
 </script>
@@ -340,6 +340,22 @@
 		drawCalendar();
 		var dayOfWeek = week[today.getDay()];
 		$('#dayOfWeek').html(today.getDate()+'일 '+dayOfWeek);
+	}
+	
+	function addSchedule(){
+		var formObj=$("form");
+		
+		$('#remove').on("click",function(e){		
+			formObj.attr("action","/board/remove");
+			formObj.submit();
+		});
+		
+		$('#list').on("click",function(e){
+			formObj.attr("action","/board/list").attr("method","get");
+			formObj.empty();
+			formObj.submit();
+		});
+
 	}
 </script>
 

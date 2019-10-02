@@ -1,4 +1,6 @@
-package calendar;
+package persistence;
+
+import javax.sql.DataSource;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,8 +11,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class CalendarApplicationTests {
+public class DataSourceTests {
 
+	@Autowired
+	private DataSource ds;
+	
 	@Autowired
 	private SqlSessionTemplate sqlSession;
 	
@@ -20,6 +25,7 @@ public class CalendarApplicationTests {
 
 	@Test
 	public void testSqlSession() throws Exception{
+		System.out.println(ds.toString());
 		System.out.println(sqlSession.toString());
 	}
 }
