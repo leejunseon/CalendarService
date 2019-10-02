@@ -10,5 +10,13 @@
 			values(#{title},#{contents},#{dateStart},#{dateEnd},#{timeStart},#{timeStart},#{repeatMonthly},#{allDay})
 		]]>
 	</insert>
+	
+	<select id="getSchedules" resultType="calendar.dto.ScheduleDto">
+		<![CDATA[
+			SELECT * FROM schedule
+			WHERE date(date_start) >= date_format(#{date}, '%Y-%m-01') and date(date_start) <= last_day(#{date})
+			ORDER BY date_start ASC;
+		]]>
+	</select>
 
 </mapper>
