@@ -14,14 +14,14 @@
 	<!-- Calendar -->
 	<div class="calendar-container">
 		<div class="calendar-header">
-			<button class="btn btn-light">Today</button>
+			<button class="btn btn-light" onclick="javascript:todaySchedule();">Today</button>
 			<div class="ico-arrow">
-				<a href="#" data-toggle="tooltip" onclick="javascript:prevMonth();" data-placement="top" title="이전">
+				<a href="#" id="leftButton" data-toggle="tooltip" onclick="javascript:prevMonth();" data-placement="top" title="이전">
 					<i class="material-icons">
 						chevron_left
 					</i>
 				</a>
-				<a href="#" data-toggle="tooltip" onclick="javascript:nextMonth();" data-placement="top" title="다음">
+				<a href="#" id="rightButton" data-toggle="tooltip" onclick="javascript:nextMonth();" data-placement="top" title="다음">
 					<i class="material-icons">
 						chevron_right
 					</i>
@@ -30,10 +30,10 @@
 			<div id="yearMonth"></div>
 			<ul class="nav nav-tabs view-tab" id="view" role="tablist">
 				<li class="nav-item">
-					<a class="nav-link active" id="tab-month" data-toggle="tab" href="#month" role="tab" aria-controls="month" aria-selected="true">월</a>
+					<a class="nav-link active" onclick="javascript:monthlySchedule();" id="tab-month" data-toggle="tab" href="#month" role="tab" aria-controls="month" aria-selected="true">월</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" id="tab-day" data-toggle="tab" href="#day" role="tab" aria-controls="day" aria-selected="false">일</a>
+					<a class="nav-link" onclick="javascript:dailySchedule();" id="tab-day" data-toggle="tab" href="#day" role="tab" aria-controls="day" aria-selected="false">일</a>
 				</li>
 			</ul>
 		</div>
@@ -61,8 +61,8 @@
 			
 			<!-- day -->
 			<div class="tab-pane" id="day" role="tabpanel" aria-labelledby="tab-day">
-				<div class="daily-calendar"><span class="day-name">3일 화요일</span>
-					<div class="event-consecutive event-start event-end" data-toggle="popover" data-html="true" data-placement="left" data-content='<div class="content-line"><div class="event-consecutive-marking"></div><div class="title"><h5>일정 1</h5><h7 class="reservation">2019년 9월 15일 – 17일</div>
+				<div class="daily-calendar" onclick='javascript:registerSchedule();'><span class="day-name" id="dayOfWeek"></span>
+					<!-- <div class="event-consecutive event-start event-end" data-toggle="popover" data-html="true" data-placement="left" data-content='<div class="content-line"><div class="event-consecutive-marking"></div><div class="title"><h5>일정 1</h5><h7 class="reservation">2019년 9월 15일 – 17일</div>
 					        </div><div class="content-line"><i class="material-icons">
 					notes
 					</i><div class="title"><h7 class="reservation">스케쥴 메모, 설명이 나타납니다.</div>'>연속 일정 1
@@ -81,7 +81,7 @@
 					        </div><div class="content-line"><i class="material-icons">
 					notes
 					</i><div class="title"><h7 class="reservation">스케쥴 메모, 설명이 나타납니다.</div>'>반복 일정 1
-					</div>
+					</div> -->
 				</div>
 			</div>
 			<!-- day end -->
@@ -197,10 +197,6 @@
         $('[data-toggle="popover"]').popover().on('inserted.bs.popover')
     });
 
-    $('.week, .daily-calendar').click(function() {
-        $('#registerSchedule').modal('show');
-    });
-
     $(".event-consecutive, .event, .event-repeated").click(function(event) {
         event.stopPropagation();
     });
@@ -229,11 +225,13 @@
 		drawCalendar();
 	});
 	
-	var today = new Date();
-	var first = new Date(today.getFullYear(), today.getMonth(),1);
-	var leapYear=[31,29,31,30,31,30,31,31,30,31,30,31];
-	var notLeapYear=[31,28,31,30,31,30,31,31,30,31,30,31];
-	var pageYear;
+	var today = new Date();//현재 날짜
+	var first = new Date(today.getFullYear(), today.getMonth(),1);//첫째 날
+	var now;//dayliSchadule 기준 날짜
+	var week = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+	var leapYear=[31,29,31,30,31,30,31,31,30,31,30,31];//윤년
+	var notLeapYear=[31,28,31,30,31,30,31,31,30,31,30,31];//윤년X
+	var pageYear;//출력 페이지
 	
 	function drawCalendar(){
 		readyDrawing();
@@ -241,6 +239,7 @@
 		showDays();
 	}
 	
+	//윤년인지 아닌지
 	function readyDrawing(){
 		if(first.getFullYear() % 4 === 0){
 		    pageYear = leapYear;
@@ -249,6 +248,7 @@
 		}
 	}
 	
+	//0000년 00월
 	function showYearMonth(){
 		var yearMonthString="<h4>";
 		var year=today.getFullYear();
@@ -258,13 +258,14 @@
 		$("#yearMonth").html(yearMonthString);
 	}
 	
+	//날짜 
 	function showDays(){
 		var dayString="";
 	    var cnt = 1;
 	    for(var i = 0; i < 6; i++){
 	    	dayString+="<div class='week'>";
 	        for(var j = 0; j < 7; j++){
-	        	dayString+="<div class='day'>";
+	        	dayString+="<div class='day' onclick='javascript:registerSchedule();'>";
 	            if((i === 0 && j < first.getDay()) || cnt > pageYear[first.getMonth()]){
 	            	dayString+="<h3 class='day-label'></h3>";
 	            }else{
@@ -278,16 +279,67 @@
 	    $("#days").html(dayString);
 	}
 	
+	//이전 달
 	function prevMonth(){
 		today = new Date(today.getFullYear(), today.getMonth()-1, today.getDate());
 		first = new Date(today.getFullYear(), today.getMonth(), 1);
 		drawCalendar();
 	}
-	
+
+	//다음 달
 	function nextMonth(){
 		today = new Date(today.getFullYear(), today.getMonth()+1, today.getDate());
 		first = new Date(today.getFullYear(), today.getMonth(), 1);
 		drawCalendar();
+	}
+	
+	//일정 등록
+	function registerSchedule(){
+		$('#registerSchedule').modal('show');
+	}
+	
+	//daily스케줄 view
+	function dailySchedule(){
+		now=first;//첫째 날 부터
+		today=now;
+		var dayOfWeek = week[now.getDay()];
+		$('#dayOfWeek').html(now.getDate()+'일 '+dayOfWeek);
+		$('#leftButton').attr("onclick","prevDay();");
+		$('#rightButton').attr("onclick","nextDay();");
+	}
+	
+	//전날 daily schedule
+	function prevDay(){
+		today = new Date(now.getFullYear(), now.getMonth(), now.getDate()-1);
+		drawCalendar();
+		now = new Date(now.getFullYear(), now.getMonth(),now.getDate()-1);
+		var dayOfWeek = week[now.getDay()];
+		$('#dayOfWeek').html(now.getDate()+'일 '+dayOfWeek);
+	}
+	
+	//다음 날 daily schedule
+	function nextDay(){
+		today = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1);
+		drawCalendar();
+		now = new Date(now.getFullYear(), now.getMonth(),now.getDate()+1);
+		var dayOfWeek = week[now.getDay()];
+		$('#dayOfWeek').html(now.getDate()+'일 '+dayOfWeek);
+	}
+	
+	//monthly Schedule view	
+	function monthlySchedule(){
+		$('#leftButton').attr("onclick","prevMonth();");
+		$('#rightButton').attr("onclick","nextMonth();");
+	}
+	
+	//오늘 스케줄 view
+	function todaySchedule(){
+		today = new Date();
+		first = new Date(today.getFullYear(), today.getMonth(),1);
+		now=today;
+		drawCalendar();
+		var dayOfWeek = week[today.getDay()];
+		$('#dayOfWeek').html(today.getDate()+'일 '+dayOfWeek);
 	}
 </script>
 
