@@ -304,10 +304,12 @@
 									
 					            	if(scheduleStart.isBefore(moment(first).format('YYYY-MM-DD'))){//일정이 이전달에 시작됐다면
 				            			schedules[k].dateStart=moment(first).format('YYYY-MM-DD');//시작을 이번달 1일로 바꿈
+				            			scheduleStart=schedules[k].dateStart;
 					            	}
 									
 									if(scheduleEnd.isAfter(moment(last).format('YYYY-MM-DD'))){//일정이 다음달에 끝난다면
 										schedules[k].dateEnd=moment(last).format('YYYY-MM-DD');//끝을 이번달 마지막날로 바꿈
+										scheduleEnd=schedules[k].dateEnd;
 									}
 									
 					            	if(!currentDate.isSame(moment(schedules[k].dateStart)))//오늘 시작되는 스케줄이 아니라면 pass
@@ -331,8 +333,11 @@
 				            		dayString+="<h5>"+original[k].title+"</h5>";
 				            		if(moment.duration(moment(original[k].dateEnd).diff(moment(original[k].dateStart))).asDays()+1>1)
 				            			dayString+="<h7 class=\"reservation\">"+moment(original[k].dateStart).format("YYYY년 MM월 DD일")+" ~ "+moment(original[k].dateEnd).format("YYYY년 MM월 DD일");
-				            		else
-				            			dayString+="<span class=\"reservation-time\">⋅오후 2:00~ 3:00</span>";
+				            		else{
+				            			var start=moment(schedules[k].timeStart, 'HH:mm:ss');
+										var end=moment(schedules[k].timeEnd, 'HH:mm:ss');
+				            			dayString+="<span class=\"reservation-time\">"+moment(start).format("hh시 mm분")+" ~ "+moment(end).format("hh시 mm분");
+				            		}
 				            		if(original[k].repeatedMonthly!=null)
 				            			dayString+="<span class=\"repeat-message\">⋅매월 반복</span></h7></div></div>";
 				            		dayString+="<div class=\"content-line\">";
@@ -394,17 +399,27 @@
 				dailyViewString="";
 				var index=-1;
 				for(var i=0;i<schedules.length;i++){
+					var scheduleStart=moment(schedules[i].dateStart, 'YYYY-MM-DD');//일정 시작날
+					var scheduleEnd=moment(schedules[i].dateEnd, 'YYYY-MM-DD');//일정 마지막날
+	            	var duration=moment.duration(scheduleEnd.diff(scheduleStart)).asDays()+1;//며칠짜리인지 구하고
+
 					dailyViewString+="<div id="+index+" onclick=\"javascript:popover("+index+");\" class=\"event event-start event-end\" data-toggle=\"popover\" data-html=\"true\" data-placement=\"top\" data-content=";
 					dailyViewString+="'<div class=\"content-line\">";
-					dailyViewString+="<div class=\"event-consecutive-marking\"></div>";
+					dailyViewString+="<div class=\"event-marking\"></div>";
 					dailyViewString+="<div class=\"title\">";
-					dailyViewString+="<h5>일정 1</h5>";
-					dailyViewString+="<h7 class=\"reservation\">2019년 9월 15일 – 17일";
+					dailyViewString+="<h5>"+schedules[i].title+"</h5>";
+					if(duration>1){
+						dailyViewString+="<h7 class=\"reservation\">"+moment(schedules[i].dateStart).format("YYYY년 MM월 DD일")+" ~ "+moment(schedules[i].dateEnd).format("YYYY년 MM월 DD일");;
+					}else{
+						var start=moment(schedules[i].timeStart, 'HH:mm:ss');
+						var end=moment(schedules[i].timeEnd, 'HH:mm:ss');
+						dailyViewString+="<h7 class=\"reservation\">"+moment(start).format("hh시 mm분")+" ~ "+moment(end).format("hh시 mm분");;
+					}
 					dailyViewString+="</div></div>";
 					dailyViewString+="<div class=\"content-line\">";
 					dailyViewString+="<i class=\"material-icons\">notes</i>";
 					dailyViewString+="<div class=\"title\">";
-					dailyViewString+="<h7 class=\"reservation\">스케쥴 메모, 설명이 나타납니다.</div></div>'>일반 일정 1</div>";
+					dailyViewString+="<h7 class=\"reservation\">"+schedules[i].contents+"</div></div>'>"+schedules[i].title+"</div>";
 					index--;
 				}
 			    $("#dailySchedules").html(dailyViewString);

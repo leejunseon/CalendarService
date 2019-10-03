@@ -1,6 +1,5 @@
 package calendar.mapper;
 
-import java.sql.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -12,8 +11,8 @@ public interface CalendarMapper {
 
 	void addSchedule(ScheduleDto schedule) throws Exception;
 
-	List<ScheduleDto> getSchedules(Date date) throws Exception;
+	List<ScheduleDto> getSchedules(String date) throws Exception;
 
-	List<ScheduleDto> getDailySchedules(Date date) throws Exception;
+	List<ScheduleDto> getDailySchedules(String date) throws Exception;
 
 }

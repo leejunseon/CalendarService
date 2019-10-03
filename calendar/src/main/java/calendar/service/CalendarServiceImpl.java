@@ -1,6 +1,7 @@
 package calendar.service;
 
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +25,15 @@ public class CalendarServiceImpl implements CalendarService{
 	@Override
 	public List<ScheduleDto> getSchedules(Date date) throws Exception {
 		// TODO Auto-generated method stub
-		return mapper.getSchedules(date);
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		return mapper.getSchedules(format.format(date));
 	}
 
 	@Override
 	public List<ScheduleDto> getDailySchedules(Date date) throws Exception {
 		// TODO Auto-generated method stub
-		return mapper.getDailySchedules(date);
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		return mapper.getDailySchedules(format.format(date));
 	}
 
 }

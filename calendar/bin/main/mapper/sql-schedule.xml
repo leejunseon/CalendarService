@@ -23,7 +23,7 @@
 	<select id="getDailySchedules" resultType="calendar.dto.ScheduleDto">
 		<![CDATA[
 			SELECT * FROM schedule
-			WHERE date(date_start) <= date_format(#{date}, '%Y-%m-%d') and date_format(#{date}, '%Y-%m-%d')<= date(date_end) 
+			WHERE date_format(#{date}, '%Y-%m-%d') BETWEEN date(date_start)  AND date(date_end) 
 			ORDER BY date_start ASC, time_start asc;
 		]]>
 	</select>
