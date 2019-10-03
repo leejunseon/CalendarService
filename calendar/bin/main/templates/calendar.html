@@ -186,19 +186,19 @@
 
     $(function () {
         $('#datetimepicker1').datetimepicker({
-            format: 'L'
+            format: 'YYYY-MM-DD'
         });
         $('#datetimepicker3').datetimepicker({
-            format: 'L'
+            format: 'YYYY-MM-DD'
         });
     });
 
     $(function () {
         $('#datetimepicker2').datetimepicker({
-            format: 'LT'
+            format: 'hh:mm:ss'
         });
         $('#datetimepicker4').datetimepicker({
-            format: 'LT'
+            format: 'hh:mm:ss'
         });
     });
 </script>
@@ -233,6 +233,7 @@
 	
 	var today = new Date();//현재 날짜
 	var first = new Date(today.getFullYear(), today.getMonth(),1);//첫째 날
+	var last = new Date( today.getFullYear(), today.getMonth()+1, 0);//마지막 날
 	var now;//dayliSchadule 기준 날짜
 	var week = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
 	var leapYear=[31,29,31,30,31,30,31,31,30,31,30,31];//윤년
@@ -270,7 +271,9 @@
 				moment(today).format('YYYY-MM-DD')
 				,
 				function(schedules){
-					var check = new Array(schedules.length);
+					first = new Date(today.getFullYear(), today.getMonth(),1);//첫째 날
+					last = new Date( today.getFullYear(), today.getMonth()+1, 0);//마지막 날
+					var check=new Array(schedules.length);//출력이 끝난 스케줄인지
 					var weekStart=first;
 					var scheduleStart;
 					var scheduleEnd;
@@ -299,6 +302,10 @@
 				            			schedules[k].dateStart=moment(first).format('YYYY-MM-DD');//시작을 이번달 1일로 바꿈
 					            	}
 									
+									if(scheduleEnd.isAfter(moment(last).format('YYYY-MM-DD'))){//일정이 다음달에 끝난다면
+										schedules[k].dateEnd=moment(last).format('YYYY-MM-DD');//끝을 이번달 마지막날로 바꿈
+									}
+									
 					            	if(!currentDate.isSame(moment(schedules[k].dateStart)))//오늘 시작되는 스케줄이 아니라면 pass
 				            			continue;
 									
@@ -324,7 +331,7 @@
 				            		dayString+="<div class=\"content-line\">";
 				            		dayString+="<i class=\"material-icons\">notes</i>";
 				            		dayString+="<div class=\"title\">";
-				            		dayString+="<h7 class=\"reservation\">스케쥴 메모, 설명이 나타납니다.</div>' data-original-title title>일반 일정 1</div>";
+				            		dayString+="<h7 class=\"reservation\">스케쥴 메모, 설명이 나타납니다.</div>' data-original-title title>"+schedules[k].title+"</div>";
 				            	}
 				            	
 				            	cnt++;

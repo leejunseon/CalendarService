@@ -14,8 +14,8 @@
 	<select id="getSchedules" resultType="calendar.dto.ScheduleDto">
 		<![CDATA[
 			SELECT * FROM schedule
-			WHERE date(date_start) >= date_format(now(), '%Y-%m-01') and date(date_start) <= last_day(now())
-			or date(date_end) >= date_format(now(), '%Y-%m-01') and date(date_end) <= last_day(now())
+			WHERE date(date_start) >= date_format(#{date}, '%Y-%m-01') and date(date_start) <= last_day(#{date})
+			or date(date_end) >= date_format(#{date}, '%Y-%m-01') and date(date_end) <= last_day(#{date})
 			ORDER BY date_start ASC;
 		]]>
 	</select>
