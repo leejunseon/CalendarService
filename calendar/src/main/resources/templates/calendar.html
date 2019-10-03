@@ -61,7 +61,7 @@
 			
 			<!-- day -->
 			<div class="tab-pane" id="day" role="tabpanel" aria-labelledby="tab-day">
-				<div class="daily-calendar" onclick='javascript:registerSchedule();'>
+				<div class="daily-calendar">
 					<span class="day-name" id="dayOfWeek"></span>
 				</div>
 			</div>
@@ -166,6 +166,7 @@
 <script src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js'></script>
 <script src='https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js'></script>
 <script type="text/javascript" src="/js/schedule.js?ver=1"></script>
+
 <script type="text/javascript">
    	$(function () {
         $('[data-toggle="tooltip"]').tooltip()
@@ -175,8 +176,8 @@
         $('#view li:first-child a').tab('show')
     });
 
-    $(function () {
-        $('[data-toggle="popover"]').popover().on('inserted.bs.popover')
+    $('.daily-calendar').click(function() {
+        $('#registerSchedule').modal('show');
     });
 
     $(".event-consecutive, .event, .event-repeated").click(function(event) {
@@ -185,19 +186,19 @@
 
     $(function () {
         $('#datetimepicker1').datetimepicker({
-        	format: 'YYYY-MM-DD'
-       	});
+            format: 'L'
+        });
         $('#datetimepicker3').datetimepicker({
-            format: 'YYYY-MM-DD'
+            format: 'L'
         });
     });
 
     $(function () {
         $('#datetimepicker2').datetimepicker({
-            format: 'hh:mm:ss'
+            format: 'LT'
         });
         $('#datetimepicker4').datetimepicker({
-            format: 'hh:mm:ss'
+            format: 'LT'
         });
     });
 </script>
@@ -222,6 +223,13 @@
 		
 	});
 	
+	function popover(){
+		$('[data-toggle="popover"]').popover().on('inserted.bs.popover')
+	}
+	
+	function registerSchedule(){
+	    $('#registerSchedule').modal('show');
+	}
 	
 	var today = new Date();//현재 날짜
 	var first = new Date(today.getFullYear(), today.getMonth(),1);//첫째 날
@@ -262,42 +270,68 @@
 				moment(today).format('YYYY-MM-DD')
 				,
 				function(schedules){
+					var check = new Array(schedules.length);
+					var weekStart=first;
 					var scheduleStart;
-					var index=0;
+					var scheduleEnd;
+					var duration;
 					var dayString="";
 				    var cnt = 1;
+				    var currentDate;
 				    for(var i = 0; i < 6; i++){
 				    	dayString+="<div class='week'>";
 				        for(var j = 0; j < 7; j++){
-							scheduleStart=moment(schedules[index].dateStart, 'YYYY-MM-DD');
-				        	dayString+="<div class='day' onclick='javascript:registerSchedule();'>";
+				        	currentDate=moment(moment(first).add(cnt-1, 'days'));
+				        	dayString+="<div class='day'>";
 				            if((i === 0 && j < first.getDay()) || cnt > pageYear[first.getMonth()]){
-				            	dayString+="<h3 class='day-label'></h3>";
+				            	dayString+="<h3 class='day-label' onclick=\"registerSchedule();\"></h3>";
 				            }else{
-				            	dayString+="<h3 class='day-label'>"+cnt+"</h3>";
+				            	dayString+="<h3 class='day-label' onclick=\"registerSchedule();\">"+cnt+"</h3>";
 				            	
-				            	//이전달에 시작된 스케줄일 때
-				            	if(scheduleStart.isBefore(moment(first).format('YYYY-MM-DD'))){
-				            		dayString+="<div class=\"event event-start event-end\" data-span=\"2\" data-toggle=\"popover\" data-html=\"true\"";
+				            	for(var k=0;k<schedules.length;k++){
+				            		if(check[k]==1)
+				            			continue;
+				            		
+									scheduleStart=moment(schedules[k].dateStart, 'YYYY-MM-DD');//일정 시작날
+									scheduleEnd=moment(schedules[k].dateEnd, 'YYYY-MM-DD');//일정 마지막날
+									
+					            	if(scheduleStart.isBefore(moment(first).format('YYYY-MM-DD'))){//일정이 이전달에 시작됐다면
+				            			schedules[k].dateStart=moment(first).format('YYYY-MM-DD');//시작을 이번달 1일로 바꿈
+					            	}
+									
+					            	if(!currentDate.isSame(moment(schedules[k].dateStart)))//오늘 시작되는 스케줄이 아니라면 pass
+				            			continue;
+									
+					            	//달력에 기록
+					            	duration=moment.duration(scheduleEnd.diff(scheduleStart)).asDays()+1;//며칠짜리인지 구하고
+				            		if(duration>7-j){//다음 주까지 이어진다면
+				            			//시작을 7-j일 이후로
+				            			schedules[k].dateStart=moment(moment(schedules[k].dateStart, 'YYYY-MM-DD').add(7-j, 'days').toDate()).format('YYYY-MM-DD');
+				            			duration=7-j;
+				            		}else{
+				            			check[k]=1;
+				            		}
+					            	
+					            	dayString+="<div onclick=\"javascript:popover();\" class=\"event event-start event-end\" data-span=\""+duration+"\" data-toggle=\"popover\" data-html=\"true\"";
 				            		dayString+="data-content=";
 				            		dayString+="'<div class=\"content-line\">";
-				            		dayString+="<div class=\"event-repeated-marking\"></div>";
-				            		dayString+="<div class=\"title\">;"
-				            		dayString+="<h5>일정 1</h5>";
+				            		dayString+="<div class=\"event-marking\"></div>";
+				            		dayString+="<div class=\"title\">"
+				            		dayString+="<h5>"+schedules[k].title+"</h5>";
 				            		dayString+="<h7 class=\"reservation\">2019년 9월 15일 – 17일";
 				            		dayString+="<span class=\"reservation-time\">⋅오후 2:00~ 3:00</span>";
 				            		dayString+="<span class=\"repeat-message\">⋅매월 반복</span></h7></div></div>";
 				            		dayString+="<div class=\"content-line\">";
 				            		dayString+="<i class=\"material-icons\">notes</i>";
 				            		dayString+="<div class=\"title\">";
-				            		dayString+="<h7 class=\"reservation\">스케쥴 메모, 설명이 나타납니다.</div></div>'>일반 일정 1</div>";
-				            		index++;
+				            		dayString+="<h7 class=\"reservation\">스케쥴 메모, 설명이 나타납니다.</div>' data-original-title title>일반 일정 1</div>";
 				            	}
 				            	
 				            	cnt++;
 				            }
 				            dayString+="</div>";
 				        }
+				        weekStart=currentDate.add(1,'days').toDate();
 				        dayString+="</div>";
 				    }
 				    $("#days").html(dayString);
@@ -318,12 +352,6 @@
 		first = new Date(today.getFullYear(), today.getMonth(), 1);
 		drawCalendar();
 	}
-	
-	//일정 등록
-	function registerSchedule(){
-		$('#registerSchedule').modal('show');
-	}
-	
 	
 	//daily스케줄 view
 	function dailySchedule(){
@@ -368,7 +396,7 @@
 		var dayOfWeek = week[today.getDay()];
 		$('#dayOfWeek').html(today.getDate()+'일 '+dayOfWeek);
 	}
-	
+
 </script>
 
 </html>

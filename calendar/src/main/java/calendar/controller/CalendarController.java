@@ -26,6 +26,11 @@ public class CalendarController {
 		return "/calendar";
 	}
 	
+	@RequestMapping("/example.do")
+	public String showExample() throws Exception{
+		return "/example";
+	}	
+	
 	@RequestMapping("/addSchedule.do")
 	public String addSchedule( ScheduleDto schedule) throws Exception{
 		service.addSchedule(schedule);
