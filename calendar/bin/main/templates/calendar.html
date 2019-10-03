@@ -209,6 +209,17 @@
 	$( document ).ready(function() {		
 		drawCalendar();
 		
+		//체크박스 이벤트
+		$("#inlineCheckbox2").change(function(){
+	        if($("#inlineCheckbox2").is(":checked")){
+	        	$("input[name=timeStart]").attr("disabled",true);
+	        	$("input[name=timeEnd]").attr("disabled",true);
+	        }else{
+	        	$("input[name=timeStart]").removeAttr("disabled");
+	        	$("input[name=timeEnd]").removeAttr("disabled");
+	        }
+	    });
+		
 		//Schedule 추가
 		var form=$("#form")
 		$("#submit").on("click",function(e){
@@ -273,6 +284,8 @@
 				moment(today).format('YYYY-MM-DD')
 				,
 				function(schedules){
+					//original에 원래 스케줄의 start,end 저장해놓고,
+					//두 줄에 걸쳐서 스케줄이 입력되는 경우에는 schedule의 시작날짜를 변경해가며 작업
 					var original=JSON.parse(JSON.stringify(schedules));
 					first = new Date(today.getFullYear(), today.getMonth(),1);//첫째 날
 					last = new Date( today.getFullYear(), today.getMonth()+1, 0);//마지막 날
@@ -325,21 +338,41 @@
 				            			check[k]=1;
 				            		}
 					            	
-					            	dayString+="<div id="+index+" onclick=\"javascript:popover("+index+");\" class=\"event event-start event-end\" data-span=\""+duration+"\" data-toggle=\"popover\" data-html=\"true\"";
-				            		dayString+="data-content=";
+					            	//schedule종류에 따라 style 바꾸기
+				            		if(moment.duration(moment(original[k].dateEnd).diff(moment(original[k].dateStart))).asDays()+1>1)
+					            		dayString+="<div id="+index+" onclick=\"javascript:popover("+index+");\" style=\"background: #0078FF;color: #fff;\" class=\"event event-start event-end\" data-span=\""+duration+"\" data-toggle=\"popover\" data-html=\"true\"";
+					            	else
+					            		dayString+="<div id="+index+" onclick=\"javascript:popover("+index+");\" class=\"event event-start event-end\" data-span=\""+duration+"\" data-toggle=\"popover\" data-html=\"true\"";
+					            	
+					            	dayString+="data-content=";
 				            		dayString+="'<div class=\"content-line\">";
-				            		dayString+="<div class=\"event-marking\"></div>";
+				            		
+				            		//schedule종류에 따라 popover 색깔 바꾸기
+				            		if(moment.duration(moment(original[k].dateEnd).diff(moment(original[k].dateStart))).asDays()+1>1)
+				            			dayString+="<div class=\"event-consecutive-marking\"></div>";
+				            		else
+				            			dayString+="<div class=\"event-marking\"></div>";
+				            		
 				            		dayString+="<div class=\"title\">"
 				            		dayString+="<h5>"+original[k].title+"</h5>";
+				            		
+				            		//duration에 따라 일정 표시 바꾸기
 				            		if(moment.duration(moment(original[k].dateEnd).diff(moment(original[k].dateStart))).asDays()+1>1)
 				            			dayString+="<h7 class=\"reservation\">"+moment(original[k].dateStart).format("YYYY년 MM월 DD일")+" ~ "+moment(original[k].dateEnd).format("YYYY년 MM월 DD일");
 				            		else{
-				            			var start=moment(schedules[k].timeStart, 'HH:mm:ss');
-										var end=moment(schedules[k].timeEnd, 'HH:mm:ss');
-				            			dayString+="<span class=\"reservation-time\">"+moment(start).format("hh시 mm분")+" ~ "+moment(end).format("hh시 mm분");
+				            			if(original[k].allDay!=null){
+				            				dayString+="<span class=\"reservation-time\">하루종일";
+				            			}else{
+				            				var start=moment(schedules[k].timeStart, 'HH:mm:ss');
+											var end=moment(schedules[k].timeEnd, 'HH:mm:ss');
+				            				dayString+="<span class=\"reservation-time\">"+moment(start).format("hh시 mm분")+" ~ "+moment(end).format("hh시 mm분");
+				            			}
 				            		}
+				            		
+				            		//매월 반복일 경우 메시지 추가
 				            		if(original[k].repeatedMonthly!=null)
 				            			dayString+="<span class=\"repeat-message\">⋅매월 반복</span></h7></div></div>";
+				            			
 				            		dayString+="<div class=\"content-line\">";
 				            		dayString+="<i class=\"material-icons\">notes</i>";
 				            		dayString+="<div class=\"title\">";
@@ -403,19 +436,31 @@
 					var scheduleEnd=moment(schedules[i].dateEnd, 'YYYY-MM-DD');//일정 마지막날
 	            	var duration=moment.duration(scheduleEnd.diff(scheduleStart)).asDays()+1;//며칠짜리인지 구하고
 
-					dailyViewString+="<div id="+index+" onclick=\"javascript:popover("+index+");\" class=\"event event-start event-end\" data-toggle=\"popover\" data-html=\"true\" data-placement=\"top\" data-content=";
+	            	//스케줄 종류에 따라 색깔 바꾸기
+	            	if(duration>1)
+						dailyViewString+="<div id="+index+" style=\"background: #0078FF;color: #fff;\" onclick=\"javascript:popover("+index+");\" class=\"event event-start event-end\" data-toggle=\"popover\" data-html=\"true\" data-placement=\"top\" data-content=";
+					else
+						dailyViewString+="<div id="+index+" onclick=\"javascript:popover("+index+");\" class=\"event event-start event-end\" data-toggle=\"popover\" data-html=\"true\" data-placement=\"top\" data-content=";
+					
 					dailyViewString+="'<div class=\"content-line\">";
 					dailyViewString+="<div class=\"event-marking\"></div>";
 					dailyViewString+="<div class=\"title\">";
 					dailyViewString+="<h5>"+schedules[i].title+"</h5>";
+					
+            		//schedule종류에 따라 popover 색깔 바꾸기
 					if(duration>1){
 						dailyViewString+="<h7 class=\"reservation\">"+moment(schedules[i].dateStart).format("YYYY년 MM월 DD일")+" ~ "+moment(schedules[i].dateEnd).format("YYYY년 MM월 DD일");;
 					}else{
-						var start=moment(schedules[i].timeStart, 'HH:mm:ss');
-						var end=moment(schedules[i].timeEnd, 'HH:mm:ss');
-						dailyViewString+="<h7 class=\"reservation\">"+moment(start).format("hh시 mm분")+" ~ "+moment(end).format("hh시 mm분");;
+						if(schedules[i].allDay!=null){
+							dailyViewString+="<h7 class=\"reservation\">하루종일";
+						}else{
+							var start=moment(schedules[i].timeStart, 'HH:mm:ss');
+							var end=moment(schedules[i].timeEnd, 'HH:mm:ss');
+							dailyViewString+="<h7 class=\"reservation\">"+moment(start).format("hh시 mm분")+" ~ "+moment(end).format("hh시 mm분");
+						}
 					}
-					dailyViewString+="</div></div>";
+					
+            		dailyViewString+="</div></div>";
 					dailyViewString+="<div class=\"content-line\">";
 					dailyViewString+="<i class=\"material-icons\">notes</i>";
 					dailyViewString+="<div class=\"title\">";

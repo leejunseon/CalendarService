@@ -1,6 +1,7 @@
 package calendar.service;
 
 import java.sql.Date;
+import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -19,6 +20,10 @@ public class CalendarServiceImpl implements CalendarService{
 	@Override
 	public void addSchedule(ScheduleDto schedule) throws Exception {
 		// TODO Auto-generated method stub
+		if(schedule.getTimeEnd()==null||schedule.getTimeStart()==null) {
+			schedule.setTimeEnd(new Time(0));
+			schedule.setTimeStart(new Time(0));
+		}
 		mapper.addSchedule(schedule);
 	}
 

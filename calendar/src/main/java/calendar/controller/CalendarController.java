@@ -24,11 +24,6 @@ public class CalendarController {
 	@RequestMapping("/calendar.do")
 	public String showCalendar() throws Exception{
 		return "/calendar";
-	}
-	
-	@RequestMapping("/example.do")
-	public String showExample() throws Exception{
-		return "/example";
 	}	
 	
 	@RequestMapping("/addSchedule.do")
