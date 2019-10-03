@@ -213,7 +213,7 @@ a:hover {
       .popover .popover-body .content-line .event-marking {
         border-radius: 4px;
         background-color: #D7E2EB; }
-      .popover .popover-body .content-line .event-repeated-marking {
+      .popover .popover-body .content-line .event-repeated-marking{
         border-radius: 4px;
         background-color: #673AB7; }
       .popover .popover-body .content-line .title {

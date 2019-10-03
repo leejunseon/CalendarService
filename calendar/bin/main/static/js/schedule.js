@@ -13,7 +13,7 @@ var scheduleService=(function(){
 					callback(result);
 			},
 			error:function(xhr,status,er){
-				alert('error!!');
+				alert('error!!'+status);
 			}
 		});
 	}

@@ -61,27 +61,8 @@
 			
 			<!-- day -->
 			<div class="tab-pane" id="day" role="tabpanel" aria-labelledby="tab-day">
-				<div class="daily-calendar" onclick='javascript:registerSchedule();'><span class="day-name" id="dayOfWeek"></span>
-					<!-- <div class="event-consecutive event-start event-end" data-toggle="popover" data-html="true" data-placement="left" data-content='<div class="content-line"><div class="event-consecutive-marking"></div><div class="title"><h5>일정 1</h5><h7 class="reservation">2019년 9월 15일 – 17일</div>
-					        </div><div class="content-line"><i class="material-icons">
-					notes
-					</i><div class="title"><h7 class="reservation">스케쥴 메모, 설명이 나타납니다.</div>'>연속 일정 1
-					</div>
-					<div class="event-consecutive event-start event-end" data-toggle="popover" data-html="true" data-placement="left" data-content='<div class="content-line"><div class="event-consecutive-marking"></div><div class="title"><h5>일정 1</h5><h7 class="reservation">2019년 9월 15일 – 17일</div>
-					        </div><div class="content-line"><i class="material-icons">
-					notes
-					</i><div class="title"><h7 class="reservation">스케쥴 메모, 설명이 나타납니다.</div>'>연속 일정 2
-					</div>
-					<div class="event event-start event-end" data-toggle="popover" data-html="true" data-placement="left" data-content='<div class="content-line"><div class="event-marking"></div><div class="title"><h5>일정 1</h5><h7 class="reservation">2019년 9월 15일 – 17일<span class="reservation-time">⋅오후 2:00~ 3:00</span></div>
-					        </div><div class="content-line"><i class="material-icons">
-					notes
-					</i><div class="title"><h7 class="reservation">스케쥴 메모, 설명이 나타납니다.</div>'>일반 일정 3
-					</div>
-					<div class="event-repeated event-start event-end" data-toggle="popover" data-html="true" data-placement="left" data-content='<div class="content-line"><div class="event-repeated-marking"></div><div class="title"><h5>일정 1</h5><h7 class="reservation">2019년 9월 15일 – 17일<span class="reservation-time">⋅오후 2:00~ 3:00</span><span class="repeat-message">⋅매월 반복</span></div>
-					        </div><div class="content-line"><i class="material-icons">
-					notes
-					</i><div class="title"><h7 class="reservation">스케쥴 메모, 설명이 나타납니다.</div>'>반복 일정 1
-					</div> -->
+				<div class="daily-calendar" onclick='javascript:registerSchedule();'>
+					<span class="day-name" id="dayOfWeek"></span>
 				</div>
 			</div>
 			<!-- day end -->
@@ -228,14 +209,10 @@
 		//Schedule 추가
 		var form=$("#form")
 		$("#submit").on("click",function(e){
-			var dateStart=moment($('input[name=dateStart]').val(),'YYYY-MM-DD');
-			var dateEnd=moment($('input[name=dateEnd]').val(),'YYYY-MM-DD');
+			var start=moment($('input[name=dateStart]').val()+" "+$('input[name=timeStart]').val(),'YYYY-MM-DD hh:mm:ss');
+			var end=moment($('input[name=dateEnd]').val()+" "+$('input[name=timeEnd]').val(),'YYYY-MM-DD hh:mm:ss');
 			
-			var timeStart=moment($('input[name=timeStart]').val(),'hh:mm:ss');
-			var timeEnd=moment($('input[name=timeEnd]').val(),'hh:mm:ss');
-			
-			if(!(dateEnd.isAfter(dateStart)||dateEnd.isSame(dateStart))||
-			!(timeEnd.isAfter(timeStart))||timeEnd.isSame(timeStart)){
+			if(!(end.isAfter(start)||end.isSame(start))){
 				alert("일정을 바르게 입력해주세요");
 				e.preventDefault();
 			}else{
@@ -285,16 +262,38 @@
 				moment(today).format('YYYY-MM-DD')
 				,
 				function(schedules){
+					var scheduleStart;
+					var index=0;
 					var dayString="";
 				    var cnt = 1;
 				    for(var i = 0; i < 6; i++){
 				    	dayString+="<div class='week'>";
 				        for(var j = 0; j < 7; j++){
+							scheduleStart=moment(schedules[index].dateStart, 'YYYY-MM-DD');
 				        	dayString+="<div class='day' onclick='javascript:registerSchedule();'>";
 				            if((i === 0 && j < first.getDay()) || cnt > pageYear[first.getMonth()]){
 				            	dayString+="<h3 class='day-label'></h3>";
 				            }else{
 				            	dayString+="<h3 class='day-label'>"+cnt+"</h3>";
+				            	
+				            	//이전달에 시작된 스케줄일 때
+				            	if(scheduleStart.isBefore(moment(first).format('YYYY-MM-DD'))){
+				            		dayString+="<div class=\"event event-start event-end\" data-span=\"2\" data-toggle=\"popover\" data-html=\"true\"";
+				            		dayString+="data-content=";
+				            		dayString+="'<div class=\"content-line\">";
+				            		dayString+="<div class=\"event-repeated-marking\"></div>";
+				            		dayString+="<div class=\"title\">;"
+				            		dayString+="<h5>일정 1</h5>";
+				            		dayString+="<h7 class=\"reservation\">2019년 9월 15일 – 17일";
+				            		dayString+="<span class=\"reservation-time\">⋅오후 2:00~ 3:00</span>";
+				            		dayString+="<span class=\"repeat-message\">⋅매월 반복</span></h7></div></div>";
+				            		dayString+="<div class=\"content-line\">";
+				            		dayString+="<i class=\"material-icons\">notes</i>";
+				            		dayString+="<div class=\"title\">";
+				            		dayString+="<h7 class=\"reservation\">스케쥴 메모, 설명이 나타납니다.</div></div>'>일반 일정 1</div>";
+				            		index++;
+				            	}
+				            	
 				            	cnt++;
 				            }
 				            dayString+="</div>";

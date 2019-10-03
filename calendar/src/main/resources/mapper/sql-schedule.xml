@@ -7,14 +7,15 @@
 	<insert id="addSchedule" parameterType="calendar.dto.ScheduleDto">
 		<![CDATA[
 			insert into schedule
-			values(#{title},#{contents},#{dateStart},#{dateEnd},#{timeStart},#{timeStart},#{repeatMonthly},#{allDay})
+			values(#{title},#{contents},#{dateStart},#{dateEnd},#{timeStart},#{timeEnd},#{repeatMonthly},#{allDay})
 		]]>
 	</insert>
 	
 	<select id="getSchedules" resultType="calendar.dto.ScheduleDto">
 		<![CDATA[
 			SELECT * FROM schedule
-			WHERE date(date_start) >= date_format(#{date}, '%Y-%m-01') and date(date_start) <= last_day(#{date})
+			WHERE date(date_start) >= date_format(now(), '%Y-%m-01') and date(date_start) <= last_day(now())
+			or date(date_end) >= date_format(now(), '%Y-%m-01') and date(date_end) <= last_day(now())
 			ORDER BY date_start ASC;
 		]]>
 	</select>
