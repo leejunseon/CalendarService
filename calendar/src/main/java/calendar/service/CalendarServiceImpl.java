@@ -27,4 +27,10 @@ public class CalendarServiceImpl implements CalendarService{
 		return mapper.getSchedules(date);
 	}
 
+	@Override
+	public List<ScheduleDto> getDailySchedules(Date date) throws Exception {
+		// TODO Auto-generated method stub
+		return mapper.getDailySchedules(date);
+	}
+
 }

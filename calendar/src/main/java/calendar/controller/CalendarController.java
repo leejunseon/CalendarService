@@ -42,5 +42,12 @@ public class CalendarController {
 	public List<ScheduleDto> getSchedules(@PathVariable("date")Date date) throws Exception{
 		log.info(date.toString());
 		return service.getSchedules(date);
-	} 
+	}
+	
+	@RequestMapping(value="/getDailySchedules.do/{date}",produces=MediaType.APPLICATION_JSON_UTF8_VALUE) 
+	@ResponseBody
+	public List<ScheduleDto> getDailySchedules(@PathVariable("date")Date date) throws Exception{
+		log.info(date.toString());
+		return service.getDailySchedules(date);
+	}
 }

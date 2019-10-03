@@ -9,8 +9,22 @@ var scheduleService=(function(){
 			url:'/getSchedules.do/'+date,
 			dataType:"json",
 			success:function(result){
-				if(callback)
-					callback(result);
+				callback(result);
+			},
+			error:function(xhr,status,er){
+				alert('error!!'+status);
+			}
+		});
+	}
+	
+	function getDailySchedules(date,callback){
+		console.log("getDailySchedules");
+		$.ajax({
+			type:'get',
+			url:'/getDailySchedules.do/'+date,
+			dataType:"json",
+			success:function(result){
+				callback(result);
 			},
 			error:function(xhr,status,er){
 				alert('error!!'+status);
@@ -19,6 +33,7 @@ var scheduleService=(function(){
 	}
 	
 	return {
-		getSchedules:getSchedules
+		getSchedules:getSchedules,
+		getDailySchedules:getDailySchedules
 	};
 })();

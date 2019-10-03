@@ -14,4 +14,6 @@ public interface CalendarMapper {
 
 	List<ScheduleDto> getSchedules(Date date) throws Exception;
 
+	List<ScheduleDto> getDailySchedules(Date date) throws Exception;
+
 }

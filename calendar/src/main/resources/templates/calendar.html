@@ -39,7 +39,7 @@
 		</div>
 		<div class="tab-content">
 		
-			<!-- month -->
+			<!-- MonthView -->
 			<div class="tab-pane active show" id="month" role="tabpanel" aria-labelledby="tab-month">
 				<div class="monthly-calendar">
 				
@@ -57,15 +57,17 @@
 					</div>
 				</div>
 			</div>
-			<!-- month end -->
+			<!-- MonthView end -->
 			
-			<!-- day -->
+			<!-- DailyView -->
 			<div class="tab-pane" id="day" role="tabpanel" aria-labelledby="tab-day">
 				<div class="daily-calendar">
 					<span class="day-name" id="dayOfWeek"></span>
+					<div id="dailySchedules">
+					</div>
 				</div>
 			</div>
-			<!-- day end -->
+			<!-- DailyView end -->
 			
 		</div>
 	</div>
@@ -271,6 +273,7 @@
 				moment(today).format('YYYY-MM-DD')
 				,
 				function(schedules){
+					var original=JSON.parse(JSON.stringify(schedules));
 					first = new Date(today.getFullYear(), today.getMonth(),1);//첫째 날
 					last = new Date( today.getFullYear(), today.getMonth()+1, 0);//마지막 날
 					var check=new Array(schedules.length);//출력이 끝난 스케줄인지
@@ -324,14 +327,17 @@
 				            		dayString+="'<div class=\"content-line\">";
 				            		dayString+="<div class=\"event-marking\"></div>";
 				            		dayString+="<div class=\"title\">"
-				            		dayString+="<h5>"+schedules[k].title+"</h5>";
-				            		dayString+="<h7 class=\"reservation\">2019년 9월 15일 – 17일";
-				            		dayString+="<span class=\"reservation-time\">⋅오후 2:00~ 3:00</span>";
-				            		dayString+="<span class=\"repeat-message\">⋅매월 반복</span></h7></div></div>";
+				            		dayString+="<h5>"+original[k].title+"</h5>";
+				            		if(moment.duration(moment(original[k].dateEnd).diff(moment(original[k].dateStart))).asDays()+1>1)
+				            			dayString+="<h7 class=\"reservation\">"+moment(original[k].dateStart).format("YYYY년 MM월 DD일")+" ~ "+moment(original[k].dateEnd).format("YYYY년 MM월 DD일");
+				            		else
+				            			dayString+="<span class=\"reservation-time\">⋅오후 2:00~ 3:00</span>";
+				            		if(original[k].repeatedMonthly!=null)
+				            			dayString+="<span class=\"repeat-message\">⋅매월 반복</span></h7></div></div>";
 				            		dayString+="<div class=\"content-line\">";
 				            		dayString+="<i class=\"material-icons\">notes</i>";
 				            		dayString+="<div class=\"title\">";
-				            		dayString+="<h7 class=\"reservation\">스케쥴 메모, 설명이 나타납니다.</div>' data-original-title title>"+schedules[k].title+"</div>";
+				            		dayString+="<h7 class=\"reservation\">"+original[k].contents+"</div>' data-original-title title>"+original[k].title+"</div>";
 				            	}
 				            	
 				            	cnt++;
@@ -344,6 +350,12 @@
 				    $("#days").html(dayString);
 				}
 			);
+	}
+	
+	//monthly Schedule view	
+	function monthlySchedule(){
+		$('#leftButton').attr("onclick","prevMonth();");
+		$('#rightButton').attr("onclick","nextMonth();");
 	}
 	
 	//이전 달
@@ -364,10 +376,36 @@
 	function dailySchedule(){
 		now=first;//첫째 날 부터
 		today=now;
+		showDailySchedule();
 		var dayOfWeek = week[now.getDay()];
 		$('#dayOfWeek').html(now.getDate()+'일 '+dayOfWeek);
 		$('#leftButton').attr("onclick","prevDay();");
 		$('#rightButton').attr("onclick","nextDay();");
+	}
+	
+	//dailySchedule 출력
+	function showDailySchedule(){
+		scheduleService.getDailySchedules(
+			moment(today).format('YYYY-MM-DD')
+			,
+			function(schedules){
+				dailyViewString="";
+				for(var i=0;i<schedules.length;i++){
+					dailyViewString+="<div class=\"event event-start event-end\" data-toggle=\"popover\" data-html=\"true\" data-placement=\"left\" data-content=";
+					dailyViewString+="'<div class=\"content-line\">";
+					dailyViewString+="<div class=\"event-consecutive-marking\"></div>";
+					dailyViewString+="<div class=\"title\">";
+					dailyViewString+="<h5>일정 1</h5>";
+					dailyViewString+="<h7 class=\"reservation\">2019년 9월 15일 – 17일";
+					dailyViewString+="</div></div>";
+					dailyViewString+="<div class=\"content-line\">";
+					dailyViewString+="<i class=\"material-icons\">notes</i>";
+					dailyViewString+="<div class=\"title\">";
+					dailyViewString+="<h7 class=\"reservation\">스케쥴 메모, 설명이 나타납니다.</div></div>'>일반 일정 1</div>";
+				}
+			    $("#dailySchedules").html(dailyViewString);
+			}
+		)
 	}
 	
 	//전날
@@ -386,12 +424,6 @@
 		now = new Date(now.getFullYear(), now.getMonth(),now.getDate()+1);
 		var dayOfWeek = week[now.getDay()];
 		$('#dayOfWeek').html(now.getDate()+'일 '+dayOfWeek);
-	}
-	
-	//monthly Schedule view	
-	function monthlySchedule(){
-		$('#leftButton').attr("onclick","prevMonth();");
-		$('#rightButton').attr("onclick","nextMonth();");
 	}
 	
 	//오늘 스케줄 view

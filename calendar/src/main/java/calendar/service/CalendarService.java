@@ -10,4 +10,6 @@ public interface CalendarService {
 	public void addSchedule(ScheduleDto schedule) throws Exception;
 
 	public List<ScheduleDto> getSchedules(Date date) throws Exception;
+
+	public List<ScheduleDto> getDailySchedules(Date date) throws Exception;
 }
