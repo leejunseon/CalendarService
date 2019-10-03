@@ -178,7 +178,7 @@
         $('#view li:first-child a').tab('show')
     });
 
-    $('.daily-calendar').click(function() {
+    $('#dayOfWeek').click(function() {
         $('#registerSchedule').modal('show');
     });
 
@@ -225,8 +225,8 @@
 		
 	});
 	
-	function popover(){
-		$('[data-toggle="popover"]').popover().on('inserted.bs.popover')
+	function popover(cnt){
+		$('#'+cnt).popover('show');
 	}
 	
 	function registerSchedule(){
@@ -283,6 +283,7 @@
 					var duration;
 					var dayString="";
 				    var cnt = 1;
+				    var index=1;
 				    var currentDate;
 				    for(var i = 0; i < 6; i++){
 				    	dayString+="<div class='week'>";
@@ -322,7 +323,7 @@
 				            			check[k]=1;
 				            		}
 					            	
-					            	dayString+="<div onclick=\"javascript:popover();\" class=\"event event-start event-end\" data-span=\""+duration+"\" data-toggle=\"popover\" data-html=\"true\"";
+					            	dayString+="<div id="+index+" onclick=\"javascript:popover("+index+");\" class=\"event event-start event-end\" data-span=\""+duration+"\" data-toggle=\"popover\" data-html=\"true\"";
 				            		dayString+="data-content=";
 				            		dayString+="'<div class=\"content-line\">";
 				            		dayString+="<div class=\"event-marking\"></div>";
@@ -338,6 +339,7 @@
 				            		dayString+="<i class=\"material-icons\">notes</i>";
 				            		dayString+="<div class=\"title\">";
 				            		dayString+="<h7 class=\"reservation\">"+original[k].contents+"</div>' data-original-title title>"+original[k].title+"</div>";
+				            		index++;
 				            	}
 				            	
 				            	cnt++;
@@ -390,8 +392,9 @@
 			,
 			function(schedules){
 				dailyViewString="";
+				var index=-1;
 				for(var i=0;i<schedules.length;i++){
-					dailyViewString+="<div class=\"event event-start event-end\" data-toggle=\"popover\" data-html=\"true\" data-placement=\"left\" data-content=";
+					dailyViewString+="<div id="+index+" onclick=\"javascript:popover("+index+");\" class=\"event event-start event-end\" data-toggle=\"popover\" data-html=\"true\" data-placement=\"top\" data-content=";
 					dailyViewString+="'<div class=\"content-line\">";
 					dailyViewString+="<div class=\"event-consecutive-marking\"></div>";
 					dailyViewString+="<div class=\"title\">";
@@ -402,6 +405,7 @@
 					dailyViewString+="<i class=\"material-icons\">notes</i>";
 					dailyViewString+="<div class=\"title\">";
 					dailyViewString+="<h7 class=\"reservation\">스케쥴 메모, 설명이 나타납니다.</div></div>'>일반 일정 1</div>";
+					index--;
 				}
 			    $("#dailySchedules").html(dailyViewString);
 			}
@@ -412,6 +416,7 @@
 	function prevDay(){
 		today = new Date(now.getFullYear(), now.getMonth(), now.getDate()-1);
 		drawCalendar();
+		showDailySchedule();
 		now = new Date(now.getFullYear(), now.getMonth(),now.getDate()-1);
 		var dayOfWeek = week[now.getDay()];
 		$('#dayOfWeek').html(now.getDate()+'일 '+dayOfWeek);
@@ -421,6 +426,7 @@
 	function nextDay(){
 		today = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1);
 		drawCalendar();
+		showDailySchedule();
 		now = new Date(now.getFullYear(), now.getMonth(),now.getDate()+1);
 		var dayOfWeek = week[now.getDay()];
 		$('#dayOfWeek').html(now.getDate()+'일 '+dayOfWeek);
@@ -432,6 +438,7 @@
 		first = new Date(today.getFullYear(), today.getMonth(),1);
 		now=today;
 		drawCalendar();
+		showDailySchedule();
 		var dayOfWeek = week[today.getDay()];
 		$('#dayOfWeek').html(today.getDate()+'일 '+dayOfWeek);
 	}
